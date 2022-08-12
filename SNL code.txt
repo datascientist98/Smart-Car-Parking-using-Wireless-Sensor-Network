@@ -1,0 +1,117 @@
+Code-1 (Node MCU- proximity sensor)
+#define BLYNK_PRINT Serial    // Comment this out to disable prints and save space
+#include <ESP8266WiFi.h>
+#include <BlynkSimpleEsp8266.h>
+
+// You should get Auth Token in the Blynk App.
+// Go to the Project Settings (nut icon).
+char auth[] = "506c08c0824f461eb1d7a3c2ca8535c2";
+
+// Your WiFi credentials.
+// Set password to "" for open networks.
+char ssid[] = "iPhone";
+char pass[] = "freeloader";
+int slot1 = 2;
+int slot_1 = 16;
+int has_obstacle = HIGH;
+WidgetLCD lcd(V1);
+
+void setup() {
+   Serial.begin(9600);
+  pinMode(slot1,INPUT);
+  pinMode(slot_1, OUTPUT);
+  Blynk.begin(auth, ssid, pass);
+  // put your setup code here, to run once:
+
+}
+
+void loop() {
+ 
+  Blynk.run();
+  has_obstacle=digitalRead(slot1);
+  Serial.print(digitalRead(slot1));
+  if(has_obstacle==LOW){
+    lcd.clear();
+    lcd.print(0,0,"OCCUPIED");
+    Serial.println("Welcome");
+    digitalWrite(slot_1,LOW);
+ }
+ else{
+  digitalWrite(slot_1,HIGH);
+  lcd.clear();
+  lcd.print(0,0,"SLOT FREE");
+  }
+  
+  // put your main code here, to run repeatedly:
+
+}
+
+
+	
+Code-2 (Arduino- Gas Sensor-Ultrasonic Sensor)
+/*
+* Ultrasonic Sensor HC-SR04 interfacing with Arduino.
+*/
+// defining the pins
+const int trigPin = 8;
+const int echoPin = 7;
+// defining variables
+long duration;
+int distance;
+int redLed = 12;
+int greenLed = 11;
+int buzzer = 10;
+int smokeA0 = A5;
+// Your threshold value
+int sensorThres = 100;
+
+void setup() {
+  pinMode(trigPin, OUTPUT); // Sets the trigPin as an Output
+  pinMode(echoPin, INPUT); // Sets the echoPin as an Input
+  pinMode(redLed, OUTPUT);
+  pinMode(greenLed, OUTPUT);
+  pinMode(buzzer, OUTPUT);
+  pinMode(smokeA0, INPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  // Clears the trigPin
+digitalWrite(trigPin, LOW);
+delayMicroseconds(2);
+// Sets the trigPin on HIGH state for 10 micro seconds
+digitalWrite(trigPin, HIGH);
+delayMicroseconds(10);
+digitalWrite(trigPin, LOW);
+// Reads the echoPin, returns the sound wave travel time in microseconds
+duration = pulseIn(echoPin, HIGH);
+// Calculating the distance
+distance= duration*0.034/2;
+// Prints the distance on the Serial Monitor
+Serial.print("Distance: ");
+Serial.println(distance);
+ 
+  int analogSensor = analogRead(smokeA0);
+
+  Serial.print("Pin A0: ");
+  Serial.println(analogSensor);
+  // Checks if it has reached the threshold value
+  if (analogSensor > sensorThres)
+  {
+    digitalWrite(redLed, HIGH);
+    digitalWrite(greenLed, LOW);
+    tone(buzzer, 10000, 9000);
+  }
+  else
+  {
+    digitalWrite(redLed, LOW);
+    digitalWrite(greenLed, HIGH);
+    noTone(buzzer);
+  }
+  delay(100);
+}
+
+	
+
+
+	
